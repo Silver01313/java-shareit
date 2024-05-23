@@ -89,5 +89,4 @@ public class UserStorageImpl implements UserStorage {
                 .map(User::getEmail)
                 .anyMatch(email -> email.equals(user.getEmail()));
     }
-
 }

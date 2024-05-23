@@ -6,13 +6,11 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
 
-/**
- * TODO Sprint add-controllers.
- */
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class Item {
+
     private long id;
     @NonNull
     @NotBlank

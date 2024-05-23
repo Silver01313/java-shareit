@@ -31,7 +31,7 @@ public class ItemController {
         return itemService.update(userId, itemId, item);
     }
 
-    @GetMapping("/itemId")
+    @GetMapping("/{itemId}")
     public ItemDto getItem(@PathVariable Long itemId) {
         return itemService.get(itemId);
     }
@@ -42,7 +42,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getRequiredItems(@RequestParam String query) {
+    public List<ItemDto> getRequiredItems(@RequestParam("text") String query) {
         return itemService.getRequired(query);
     }
 
