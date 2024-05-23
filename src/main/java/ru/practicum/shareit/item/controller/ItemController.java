@@ -5,12 +5,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 
-import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -31,7 +27,7 @@ public class ItemController {
         return itemService.update(userId, itemId, item);
     }
 
-    @GetMapping("/itemId")
+    @GetMapping("/{itemId}")
     public ItemDto getItem(@PathVariable Long itemId) {
         return itemService.get(itemId);
     }
@@ -42,7 +38,7 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getRequiredItems(@RequestParam String query) {
+    public List<ItemDto> getRequiredItems(@RequestParam("text") String query) {
         return itemService.getRequired(query);
     }
 

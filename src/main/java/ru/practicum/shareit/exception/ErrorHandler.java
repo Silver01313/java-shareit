@@ -6,8 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.storage.ItemStorageImpl;
-import ru.practicum.shareit.user.controller.UserController;
-import ru.practicum.shareit.user.service.UserServiceImpl;
 import ru.practicum.shareit.user.storage.UserStorageImpl;
 
 import java.util.Map;

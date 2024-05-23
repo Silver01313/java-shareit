@@ -43,7 +43,7 @@ public class UserStorageImpl implements UserStorage {
             newUser.setName(user.getName());
         }
 
-        if(user.getEmail() != null) {
+        if (user.getEmail() != null) {
             users.remove(userId);
             if (isUserAlreadyExist(user)) {
                 users.put(userId,newUser);
@@ -89,5 +89,4 @@ public class UserStorageImpl implements UserStorage {
                 .map(User::getEmail)
                 .anyMatch(email -> email.equals(user.getEmail()));
     }
-
 }

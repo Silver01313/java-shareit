@@ -9,9 +9,6 @@ import ru.practicum.shareit.user.model.User;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -35,7 +32,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public UserDto getUser(@PathVariable long userId){
+    public UserDto getUser(@PathVariable long userId) {
         return userService.get(userId);
     }
 
