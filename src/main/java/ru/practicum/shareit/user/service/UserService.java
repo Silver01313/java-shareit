@@ -13,7 +13,7 @@ public interface UserService {
 
     List<UserDto> getAll();
 
-    UserDto get(long userId);
+    User get(long userId);
 
-    void remove(long userId);
+    void delete(long userId);
 }

@@ -16,4 +16,6 @@ public interface ItemStorage {
     List<Item> getAll(Long userId);
 
     List<Item> getRequired(String query);
+
+    List<Item> getAllItems();
 }
