@@ -28,18 +28,18 @@ public class ItemServiceImpl implements ItemService {
         }
 
         if (item.getAvailable() == null) {
-            log.debug("Отсутствует название предмета");
-            throw new NoArgumentsException("Отсутствует название предмета");
+            log.debug("Отсутствует статус  доступности  предмета");
+            throw new NoArgumentsException("Отсутствует статус  доступности предмета");
         }
 
         if (item.getName() == null || item.getName().isBlank()) {
-            log.debug("Отсутствует описание предмета");
-            throw new NoArgumentsException("Отсутствует описание предмета");
+            log.debug("Отсутствует название  предмета");
+            throw new NoArgumentsException("Отсутствует название предмета");
         }
 
         if (item.getDescription() == null || item.getDescription().isBlank()) {
-            log.debug("Отсутствует статус доступности предмета");
-            throw new NoArgumentsException("Отсутствует статус доступности предмета");
+            log.debug("Отсутствует описание  предмета");
+            throw new NoArgumentsException("Отсутствует  описание предмета");
         }
 
         return ItemMapper.toItemDto(itemStorage.create(userId, item));
