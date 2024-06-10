@@ -4,11 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.user.model.User;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
 @AllArgsConstructor
@@ -18,14 +16,17 @@ import javax.persistence.Table;
 public class Comment {
 
     @Id
+
     private long id;
     @NonNull
     private String text;
     @NonNull
-    @Column(name = "item_id")
-    private long itemId;
+    @JoinColumn(name = "item_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Item item;
     @NonNull
-    @Column(name = "author_id")
-    private long authorId;
+    @JoinColumn(name = "author_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User author;
 
 }

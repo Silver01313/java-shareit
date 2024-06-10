@@ -7,8 +7,8 @@ public class CommentMapper {
     public static Comment toComment(CommentDto commentDto) {
         return new Comment(
                 commentDto.getText(),
-                commentDto.getItemId(),
-                commentDto.getAuthorId()
+                commentDto.getItem(),
+                commentDto.getAuthor()
         );
     }
 
@@ -16,8 +16,8 @@ public class CommentMapper {
         return new CommentDto(
                 comment.getId(),
                 comment.getText(),
-                comment.getItemId(),
-                comment.getAuthorId()
+                comment.getItem(),
+                comment.getAuthor()
         );
     }
 }
