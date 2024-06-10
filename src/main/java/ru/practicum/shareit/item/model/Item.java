@@ -4,13 +4,18 @@ import lombok.*;
 import ru.practicum.shareit.itemRequest.model.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
+
 public class Item {
 
+    @Id
     private long id;
     @NonNull
     @NotBlank
