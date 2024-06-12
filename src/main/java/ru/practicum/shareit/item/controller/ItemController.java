@@ -35,7 +35,7 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getAll(userId);
+        return itemService.getAllItemsByUser(userId);
     }
 
     @GetMapping("/search")

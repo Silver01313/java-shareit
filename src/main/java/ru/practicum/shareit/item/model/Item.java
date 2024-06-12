@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
+@NoArgsConstructor
 @Entity
 @Table(name = "items")
 public class Item {
@@ -28,7 +29,7 @@ public class Item {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
     private User owner;
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "item_request_id")
     private ItemRequest request;
 
