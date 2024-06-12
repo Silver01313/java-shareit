@@ -18,5 +18,6 @@ public class User {
     private String name;
     @NotNull
     @Email
+    @Column(unique = true)
     private String email;
 }
