@@ -1,0 +1,61 @@
+package ru.practicum.shareit.booking.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import ru.practicum.shareit.booking.model.Booking;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+public interface BookingRepository extends JpaRepository<Booking, Long > {
+
+    Booking save(Booking booking);
+
+    Booking findById(long bookingId);
+
+    @Query("Select b from Booking b " +
+            "JOIN FETCH b.item i " +
+            "JOIN FETCH b.booker bk " +
+            "WHERE bk.id = ?1 " +
+            "ORDER BY b.start DESC")
+    List <Booking> findAllByBookerId(long bookerId);
+
+    @Query("Select b from Booking b " +
+            "JOIN FETCH b.item i " +
+            "JOIN FETCH b.booker bk " +
+            "WHERE bk.id = ?1 " +
+            "AND b.start < ?2 " +
+            "AND b.end > ?2 " +
+            "ORDER BY b.start DESC")
+    List <Booking> findAllCurrentByBookerId(long bookerId, LocalDateTime now);
+
+    @Query("Select b from Booking b " +
+            "JOIN FETCH b.item i " +
+            "JOIN FETCH b.booker bk " +
+            "WHERE bk.id = ?1 " +
+            "AND b.end < ?2 " +
+            "ORDER BY b.start DESC")
+    List <Booking> findAllPastByBookerId(long bookerId, LocalDateTime now);
+
+    @Query("Select b from Booking b " +
+            "JOIN FETCH b.item i " +
+            "JOIN FETCH b.booker bk " +
+            "WHERE bk.id = ?1 " +
+            "AND b.start > ?2 " +
+            "ORDER BY b.start DESC")
+    List <Booking> findAllFutureByBookerId(long bookerId, LocalDateTime now);
+
+    @Query("Select b from Booking b " +
+            "JOIN FETCH b.item i " +
+            "JOIN FETCH b.booker bk " +
+            "WHERE bk.id = ?1 " +
+            "AND upper(b.status) = ?2" +
+            "ORDER BY b.start DESC")
+    List <Booking> findAllByBookerIdByStatus(long bookerId, String status);
+
+/*
+    List <Booking> findAllByOwnerItems(long ownerId, String param);
+*/
+
+
+}

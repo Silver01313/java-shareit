@@ -1,16 +1,23 @@
 package ru.practicum.shareit.booking.dto;
 
-import ru.practicum.shareit.booking.Booking;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.dto.UserMapper;
+import ru.practicum.shareit.user.model.User;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class BookingMapper {
 
-    public static Booking toBooking(BookingDto bookingDto) {
+    public static Booking toBooking(BookingDtoFromFrontend bookingDto, User user, Item item) {
         return new Booking(
                 bookingDto.getStart(),
                 bookingDto.getEnd(),
-                bookingDto.getItem(),
-                bookingDto.getBooker(),
-                bookingDto.getStatus()
+                item,
+                user,
+                bookingDto.getStatus() != null ? bookingDto.getStatus() : "WAITING"
         );
     }
 
@@ -19,9 +26,22 @@ public class BookingMapper {
                 booking.getId(),
                 booking.getStart(),
                 booking.getEnd(),
-                booking.getItem(),
-                booking.getBooker(),
+                ItemMapper.toItemDto(booking.getItem()),
+                UserMapper.toUserDto(booking.getBooker()),
                 booking.getStatus()
         );
+    }
+
+    public static BookingDtoWithoutTime toBookingDtoWithoutTime(Booking booking) {
+        return new BookingDtoWithoutTime(
+                booking.getId(),
+                ItemMapper.toItemDto(booking.getItem()),
+                UserMapper.toUserDto(booking.getBooker()),
+                booking.getStatus()
+        );
+    }
+
+    public static List<BookingDto> CollectionToBookingDto(List<Booking> bookings) {
+        return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 }

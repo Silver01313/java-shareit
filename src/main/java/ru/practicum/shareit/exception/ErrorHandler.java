@@ -1,10 +1,13 @@
 package ru.practicum.shareit.exception;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.practicum.shareit.booking.controller.BookingController;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.storage.ItemStorageImpl;
 import ru.practicum.shareit.user.controller.UserController;
@@ -15,9 +18,11 @@ import ru.practicum.shareit.user.storage.UserStorageImpl;
 
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = { UserStorageImpl.class, UserService.class, UserController.class,
-        UserServiceImpl.class, UserRepository.class,
-        ItemStorageImpl.class, ItemStorageImpl.class, ItemController.class,})
+@RestControllerAdvice(assignableTypes = {UserStorageImpl.class, UserService.class, UserController.class,
+        UserServiceImpl.class, UserRepository.class, ItemStorageImpl.class, ItemStorageImpl.class,
+        ItemController.class, BookingController.class, BookingService.class, BookingServiceImpl.class,
+        BookingRepository.class})
+
 public class ErrorHandler {
 
     @ExceptionHandler
@@ -33,6 +38,12 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleNoArguments(UnsupportedStatusException e) {
+        return Map.of("error", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Map<String, String> handleNoAcces(NoAccessException e) {
         return Map.of("У вас нет доступа", e.getMessage());
@@ -40,7 +51,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public Map<String, String> handleNotFound(NotFoundException e ) {
+    public Map<String, String> handleNotFound(NotFoundException e) {
         return Map.of("Объект не найден", e.getMessage());
     }
 }

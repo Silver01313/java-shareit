@@ -25,6 +25,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
 
+    @Override
     public ItemDto create(Long userId, ItemDto item) {
         if (userId == null) {
             log.debug("Отсутствует идентификатор пользователя");
@@ -51,6 +52,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(newItem));
     }
 
+    @Override
     public ItemDto update(Long userId, Long itemId, ItemDto item) {
         if (userId == null) {
             log.debug("Отсутствует идентификатор пользователя");
@@ -72,6 +74,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemMapper.toItemDto(itemRepository.save(newItem));
     }
 
+    @Override
     public Item get(Long itemId) {
     /*    if (!itemRepository.findAll().contains(itemRepository.findById(itemId))) {
             log.debug("Такой вещи не существует");
@@ -82,6 +85,7 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
     }
 
+    @Override
     public List<ItemDto> getAllItemsByUser(Long userId) {
         if (userId == null) {
             log.debug("Отсутствует идентификатор пользователя");
@@ -91,6 +95,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findAllByOwnerId(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
+    @Override
     public List<ItemDto> getRequired(String text) {
         if (text.isBlank()) return Collections.emptyList();
         return itemRepository.getRequired(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
