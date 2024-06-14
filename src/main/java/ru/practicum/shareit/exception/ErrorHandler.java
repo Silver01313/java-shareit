@@ -39,7 +39,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNoArguments(UnsupportedStatusException e) {
+    public Map<String, String> handleNoArguments(UnsupportedArgumentException e) {
         return Map.of("error", e.getMessage());
     }
 

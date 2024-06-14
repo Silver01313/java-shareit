@@ -2,17 +2,15 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoFromFrontend;
-import ru.practicum.shareit.booking.dto.BookingDtoWithoutTime;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NoArgumentsException;
-import ru.practicum.shareit.exception.UnsupportedStatusException;
+import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.exception.UnsupportedArgumentException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
@@ -20,7 +18,6 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -68,11 +65,16 @@ public class BookingServiceImpl implements BookingService {
             throw new NoArgumentsException("Время начала не может быть после времени конца");
         }
 
-        Item item = itemService.get(bookingDto.getItemId());
+        Item item = itemService.getById(bookingDto.getItemId());
 
         if (item.getAvailable().equals(false)) {
             log.debug("Вещь недоступна");
             throw new NoArgumentsException("Вещь недоступна");
+        }
+
+        if (item.getOwner().getId() == userId) {
+            log.debug("Бронирование недоступно для владельца");
+            throw new NotFoundException("Бронирование недоступно для владельца");
         }
 
         User user = userService.get(userId);
@@ -84,12 +86,23 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto update(long ownerId, long bookingId, boolean approved) {
 
+        if (bookingRepository.findById(bookingId) == null) {
+            log.debug("Бронирование не найдено");
+            throw new NotFoundException("Бронирование не найдено");
+        }
+
         Booking booking = bookingRepository.findById(bookingId);
+
+        if(booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
+            log.debug("Подверждение уже прошло");
+            throw  new UnsupportedArgumentException("Подверждение уже прошло");
+        }
+
         long realOwnerId = booking.getItem().getOwner().getId();
 
         if (realOwnerId != ownerId) {
             log.debug("Подтвердить бронирование может только владелец вещи");
-            throw new NoAccessException("Подтвердить бронирование может только владелец вещи");
+            throw new NotFoundException("Подтвердить бронирование может только владелец вещи");
         }
 
         if (approved) booking.setStatus("APPROVED");
@@ -101,13 +114,18 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBooking(long userId, long bookingId) {
 
+        if (bookingRepository.findById(bookingId) == null) {
+            log.debug("Бронирование не найдено");
+            throw new NotFoundException("Бронирование не найдено");
+        }
         Booking booking = bookingRepository.findById(bookingId);
+
         User booker = booking.getBooker();
         User owner = booking.getItem().getOwner();
 
         if (booker.getId() != userId && owner.getId() != userId) {
             log.debug("У вас нет доступа к этому бронированию");
-            throw new NoAccessException("У вас нет доступа к этому бронированию");
+            throw new NotFoundException("У вас нет доступа к этому бронированию");
         }
         return BookingMapper.toBookingDto(booking);
     }
@@ -117,7 +135,6 @@ public class BookingServiceImpl implements BookingService {
     public List<BookingDto> findAllByBookerId(long bookerId, String param) {
 
         User booker = userService.get(bookerId);
-
         LocalDateTime now = LocalDateTime.now();
 
         if (param.equalsIgnoreCase("ALL")) {
@@ -147,16 +164,43 @@ public class BookingServiceImpl implements BookingService {
         }
 
         log.debug("Такой параметр не поддерживается");
-        throw new UnsupportedStatusException("Unknown state: UNSUPPORTED_STATUS");
+        throw new UnsupportedArgumentException("Unknown state: UNSUPPORTED_STATUS");
     }
 
     @Override
     public List<BookingDto> findAllByOwnerItems(long ownerId, String param) {
 
         User owner = userService.get(ownerId);
+        LocalDateTime now = LocalDateTime.now();
 
-        return bookingRepository.findAllByBookerId(ownerId)
-                .stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
+        if (param.equalsIgnoreCase("ALL")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
+        }
+
+        if (param.equalsIgnoreCase("CURRENT")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
+        }
+
+        if (param.equalsIgnoreCase("PAST")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
+        }
+
+        if (param.equalsIgnoreCase("FUTURE")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
+        }
+
+        if (param.equalsIgnoreCase("WAITING")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository
+                    .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
+        }
+
+        if (param.equalsIgnoreCase("REJECTED")) {
+            return BookingMapper.CollectionToBookingDto(bookingRepository
+                    .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
+        }
+
+        log.debug("Такой параметр не поддерживается");
+        throw new UnsupportedArgumentException("Unknown state: UNSUPPORTED_STATUS");
+
     }
-
 }

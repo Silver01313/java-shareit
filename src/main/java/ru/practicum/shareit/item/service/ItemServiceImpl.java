@@ -3,18 +3,25 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.dto.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingWithIdAndBookerId;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NoArgumentsException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -24,6 +31,7 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
     private final UserService userService;
+    private final BookingRepository bookingRepository;
 
     @Override
     public ItemDto create(Long userId, ItemDto item) {
@@ -60,7 +68,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Item newItem = itemRepository.findById(itemId)
-                .orElseThrow(()-> new NotFoundException("Вещь не найдена"));
+                .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
 
         if (userId != newItem.getOwner().getId()) {
             log.debug("Вы не являетесь владельцем вещи");
@@ -68,31 +76,102 @@ public class ItemServiceImpl implements ItemService {
         }
 
         if (item.getName() != null) newItem.setName(item.getName());
-        if(item.getDescription() != null) newItem.setDescription(item.getDescription());
+        if (item.getDescription() != null) newItem.setDescription(item.getDescription());
         if (item.getAvailable() != null) newItem.setAvailable(item.getAvailable());
 
         return ItemMapper.toItemDto(itemRepository.save(newItem));
     }
 
     @Override
-    public Item get(Long itemId) {
-    /*    if (!itemRepository.findAll().contains(itemRepository.findById(itemId))) {
-            log.debug("Такой вещи не существует");
-            throw new NotFoundException("Такой вещи не существует");
-        }*/
+    public ItemWithBookingsDto get(Long itemId, Long userId) {
 
+        Item item = itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
+
+        if (item.getOwner().getId() != userId) {
+            return ItemMapper.toItemWithBookingDto(item, null, null);
+        }
+
+        String status = "APPROVED";
+        LocalDateTime now =LocalDateTime.now();
+
+
+        /*List<Booking> lastBookings = bookingRepository.getLastBookingByItem(itemId, now, status);
+        List<Booking> nextBookings = bookingRepository.getNextBookingByItem(itemId, now, status);
+
+        if (lastBookings.isEmpty() && nextBookings.isEmpty()) {
+            return ItemMapper.toItemWithBookingDto(item, null, null);
+        }
+
+        if (lastBookings.isEmpty()) {
+            return ItemMapper.toItemWithBookingDto(item,
+                    null,
+                    BookingMapper.toBookingWithIdAndBookerId(nextBookings.get(0).getId(),
+                            nextBookings.get(0).getBooker().getId()));
+        }
+
+        if (nextBookings.isEmpty()) {
+            return ItemMapper.toItemWithBookingDto(item,
+                    BookingMapper.toBookingWithIdAndBookerId(lastBookings.get(0).getId(),
+                            lastBookings.get(0).getBooker().getId()),
+                    null);
+        }
+
+        return ItemMapper.toItemWithBookingDto(item,
+                BookingMapper.toBookingWithIdAndBookerId(lastBookings.get(0).getId(),
+                        lastBookings.get(0).getBooker().getId()),
+                BookingMapper.toBookingWithIdAndBookerId(nextBookings.get(0).getId(),
+                        nextBookings.get(0).getBooker().getId()));*/
+
+        List<Booking>lastBookings = bookingRepository.getLastBookingsByItem(itemId, now, status);
+        List<Booking>nextBookings = bookingRepository.getNextBookingsByItem(itemId, now, status);
+
+        Booking lastBooking = bookingRepository.getLastBookingByItem(itemId, now, status);
+        Booking nextBooking = bookingRepository.getNextBookingByItem(itemId, now, status);
+
+        if (lastBooking == null && nextBooking == null ) {
+            return ItemMapper.toItemWithBookingDto(item, null, null);
+        }
+
+        if (lastBooking == null) {
+            return ItemMapper.toItemWithBookingDto(item,
+                    null,
+                    BookingMapper.toBookingWithIdAndBookerId(nextBooking.getId(),
+                            nextBooking.getBooker().getId()));
+        }
+
+        if (nextBooking == null) {
+            return ItemMapper.toItemWithBookingDto(item,
+                    BookingMapper.toBookingWithIdAndBookerId(lastBooking.getId(),
+                            lastBooking.getBooker().getId()),
+                    null);
+        }
+
+        return ItemMapper.toItemWithBookingDto(item,
+                BookingMapper.toBookingWithIdAndBookerId(lastBooking.getId(),
+                        lastBooking.getBooker().getId()),
+                BookingMapper.toBookingWithIdAndBookerId(nextBooking.getId(),
+                        nextBooking.getBooker().getId()));
+
+    }
+
+    @Override
+    public Item getById(Long itemId) {
         return itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
     }
 
     @Override
-    public List<ItemDto> getAllItemsByUser(Long userId) {
+    public List<ItemWithBookingsDto> getAllItemsByUser(Long userId) {
         if (userId == null) {
             log.debug("Отсутствует идентификатор пользователя");
             throw new NoArgumentsException("Отсутствует идентификатор пользователя");
         }
 
-        return itemRepository.findAllByOwnerId(userId).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<Item> itemList = itemRepository.findAllByOwnerId(userId);
+        return itemRepository.findAllByOwnerId(userId).stream()
+                .map(item -> ItemMapper.toItemWithBookingDto(item, null, null))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -41,6 +41,14 @@ public class BookingMapper {
         );
     }
 
+    public static BookingWithIdAndBookerId toBookingWithIdAndBookerId(long id, long bookerId) {
+        return new BookingWithIdAndBookerId(
+                id,
+                bookerId
+        );
+    }
+
+
     public static List<BookingDto> CollectionToBookingDto(List<Booking> bookings) {
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
