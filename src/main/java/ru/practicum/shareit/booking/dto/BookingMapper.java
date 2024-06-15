@@ -40,7 +40,7 @@ public class BookingMapper {
     }
 
 
-    public static List<BookingDto> CollectionToBookingDto(List<Booking> bookings) {
+    public static List<BookingDto> collectionToBookingDto(List<Booking> bookings) {
         return bookings.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 }

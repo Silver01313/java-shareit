@@ -93,7 +93,7 @@ public class BookingServiceImpl implements BookingService {
 
         Booking booking = bookingRepository.findById(bookingId);
 
-        if(booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
+        if (booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
             log.debug("Подверждение уже прошло");
             throw  new UnsupportedArgumentException("Подверждение уже прошло");
         }
@@ -106,7 +106,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (approved) booking.setStatus("APPROVED");
-        if(!approved) booking.setStatus("REJECTED");
+        if (!approved) booking.setStatus("REJECTED");
 
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
@@ -140,28 +140,28 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
 
         if (param.equalsIgnoreCase("ALL")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
         }
 
         if (param.equalsIgnoreCase("CURRENT")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
         }
 
         if (param.equalsIgnoreCase("PAST")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
         }
 
         if (param.equalsIgnoreCase("FUTURE")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
         }
 
         if (param.equalsIgnoreCase("WAITING")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository
+            return BookingMapper.collectionToBookingDto(bookingRepository
                     .findAllByBookerIdByStatus(bookerId, "WAITING"));
         }
 
         if (param.equalsIgnoreCase("REJECTED")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository
+            return BookingMapper.collectionToBookingDto(bookingRepository
                     .findAllByBookerIdByStatus(bookerId, "REJECTED"));
         }
 
@@ -176,28 +176,28 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
 
         if (param.equalsIgnoreCase("ALL")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
         }
 
         if (param.equalsIgnoreCase("CURRENT")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
         }
 
         if (param.equalsIgnoreCase("PAST")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
         }
 
         if (param.equalsIgnoreCase("FUTURE")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
+            return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
         }
 
         if (param.equalsIgnoreCase("WAITING")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository
+            return BookingMapper.collectionToBookingDto(bookingRepository
                     .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
         }
 
         if (param.equalsIgnoreCase("REJECTED")) {
-            return BookingMapper.CollectionToBookingDto(bookingRepository
+            return BookingMapper.collectionToBookingDto(bookingRepository
                     .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
         }
 
