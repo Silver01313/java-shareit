@@ -8,9 +8,8 @@ import ru.practicum.shareit.booking.dto.BookingDtoFromFrontend;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.NoArgumentsException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.UnsupportedArgumentException;
+import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.model.User;
@@ -37,39 +36,39 @@ public class BookingServiceImpl implements BookingService {
 
         if (start == null) {
             log.debug("Отсутствует время начала");
-            throw new NoArgumentsException("Отсутствует время начала");
+            throw new ValidationException("Отсутствует время начала");
         }
 
         if (end == null) {
             log.debug("Отсутствует время конца");
-            throw new NoArgumentsException("Отсутствует время конца");
+            throw new ValidationException("Отсутствует время конца");
         }
 
         if (end.equals(start)) {
             log.debug("Время начала не может быть равно времени конца");
-            throw new NoArgumentsException("Время начала не может быть равно времени конца");
+            throw new ValidationException("Время начала не может быть равно времени конца");
         }
 
         if (end.isBefore(now)) {
             log.debug("Время конца не может быть в прошлом");
-            throw new NoArgumentsException("Время конца не может быть в прошлом");
+            throw new ValidationException("Время конца не может быть в прошлом");
         }
 
         if (start.isBefore(now)) {
             log.debug("Время начала не может быть в будущем");
-            throw new NoArgumentsException("Время начала не может быть в будущем");
+            throw new ValidationException("Время начала не может быть в будущем");
         }
 
         if (start.isAfter(end)) {
             log.debug("Время начала не может быть после времени конца");
-            throw new NoArgumentsException("Время начала не может быть после времени конца");
+            throw new ValidationException("Время начала не может быть после времени конца");
         }
 
         Item item = itemService.getById(bookingDto.getItemId());
 
         if (item.getAvailable().equals(false)) {
             log.debug("Вещь недоступна");
-            throw new NoArgumentsException("Вещь недоступна");
+            throw new ValidationException("Вещь недоступна");
         }
 
         if (item.getOwner().getId() == userId) {
@@ -95,7 +94,7 @@ public class BookingServiceImpl implements BookingService {
 
         if (booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
             log.debug("Подверждение уже прошло");
-            throw  new UnsupportedArgumentException("Подверждение уже прошло");
+            throw new ValidationException("Подверждение уже прошло");
         }
 
         long realOwnerId = booking.getItem().getOwner().getId();
@@ -105,8 +104,13 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Подтвердить бронирование может только владелец вещи");
         }
 
-        if (approved) booking.setStatus("APPROVED");
-        if (!approved) booking.setStatus("REJECTED");
+        if (approved) {
+            booking.setStatus("APPROVED");
+        }
+
+        if (!approved) {
+            booking.setStatus("REJECTED");
+        }
 
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
@@ -139,34 +143,31 @@ public class BookingServiceImpl implements BookingService {
         User booker = userService.get(bookerId);
         LocalDateTime now = LocalDateTime.now();
 
-        if (param.equalsIgnoreCase("ALL")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
-        }
+        switch (param) {
+            case ("ALL"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
 
-        if (param.equalsIgnoreCase("CURRENT")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
-        }
+            case ("CURRENT"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
 
-        if (param.equalsIgnoreCase("PAST")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
-        }
+            case ("PAST"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
 
-        if (param.equalsIgnoreCase("FUTURE")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
-        }
+            case ("FUTURE"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
 
-        if (param.equalsIgnoreCase("WAITING")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository
-                    .findAllByBookerIdByStatus(bookerId, "WAITING"));
-        }
+            case ("WAITING"):
+                return BookingMapper.collectionToBookingDto(bookingRepository
+                        .findAllByBookerIdByStatus(bookerId, "WAITING"));
 
-        if (param.equalsIgnoreCase("REJECTED")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository
-                    .findAllByBookerIdByStatus(bookerId, "REJECTED"));
-        }
+            case ("REJECTED"):
+                return BookingMapper.collectionToBookingDto(bookingRepository
+                        .findAllByBookerIdByStatus(bookerId, "REJECTED"));
 
-        log.debug("Такой параметр не поддерживается");
-        throw new UnsupportedArgumentException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                log.debug("Такой параметр не поддерживается");
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 
     @Override
@@ -175,33 +176,30 @@ public class BookingServiceImpl implements BookingService {
         User owner = userService.get(ownerId);
         LocalDateTime now = LocalDateTime.now();
 
-        if (param.equalsIgnoreCase("ALL")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
-        }
+        switch (param) {
+            case ("ALL"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
 
-        if (param.equalsIgnoreCase("CURRENT")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
-        }
+            case ("CURRENT"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
 
-        if (param.equalsIgnoreCase("PAST")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
-        }
+            case ("PAST"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
 
-        if (param.equalsIgnoreCase("FUTURE")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
-        }
+            case ("FUTURE"):
+                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
 
-        if (param.equalsIgnoreCase("WAITING")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository
-                    .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
-        }
+            case ("WAITING"):
+                return BookingMapper.collectionToBookingDto(bookingRepository
+                        .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
 
-        if (param.equalsIgnoreCase("REJECTED")) {
-            return BookingMapper.collectionToBookingDto(bookingRepository
-                    .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
-        }
+            case ("REJECTED"):
+                return BookingMapper.collectionToBookingDto(bookingRepository
+                        .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
 
-        log.debug("Такой параметр не поддерживается");
-        throw new UnsupportedArgumentException("Unknown state: UNSUPPORTED_STATUS");
+            default:
+                log.debug("Такой параметр не поддерживается");
+                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
     }
 }

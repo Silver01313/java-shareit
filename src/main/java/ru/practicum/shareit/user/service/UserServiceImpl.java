@@ -22,10 +22,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(User user) {
-       /* if (isUserAlreadyExist(user)) {
-            log.debug("Пользователь с таким email уже существует");
-            throw new AlreadyExistsException("Пользователь с таким email уже существует");
-        }*/
       return UserMapper.toUserDto(userRepository.save(user));
     }
 
@@ -33,11 +29,6 @@ public class UserServiceImpl implements UserService {
     public UserDto update(User user, Long userId) {
         User newUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
-
-  /*      if (user.getEmail() != null && isEmailAlreadyExistsWhenUpdatesUser(user, userId)) {
-                log.debug("Пользователь с таким email уже существует");
-                throw new AlreadyExistsException("Пользователь с таким email уже существует");
-        }*/
 
         if (user.getName() != null) {
             newUser.setName(user.getName());
@@ -52,7 +43,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserDto> getAll() {
-        if (userRepository.findAll().isEmpty()) return new ArrayList<>();
+        if (userRepository.findAll().isEmpty()) {
+            return new ArrayList<>();
+        }
         return userRepository.findAll().stream().map(UserMapper::toUserDto).collect(Collectors.toList());
     }
 
