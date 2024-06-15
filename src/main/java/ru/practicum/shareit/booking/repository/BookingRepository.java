@@ -67,7 +67,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long > {
             "WHERE i.owner.id = ?1 " +
             "AND b.start < ?2 " +
             "AND b.end > ?2 " +
-            "ORDER BY b.start DESC")
+            "ORDER BY b.start ")
     List <Booking> findAllCurrentByOwnerItems(long ownerId, LocalDateTime now);
 
     @Query("Select b from Booking b " +
@@ -97,7 +97,6 @@ public interface BookingRepository extends JpaRepository<Booking, Long > {
     @Query(value = "Select b.* from Bookings b " +
             "WHERE b.item_id = ?1 " +
             "AND b.start_time < ?2 " +
-           /* "AND b.end_time < ?2 " +*/
             "AND b.status = ?3 " +
             "ORDER BY b.start_time DESC " +
             "LIMIT 1" , nativeQuery = true)
@@ -119,5 +118,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long > {
             "ORDER BY b.start_time " +
             "LIMIT 1" , nativeQuery = true)
     Booking getBookingByBooker(long itemId, long bookerId ,LocalDateTime now ,String status);
-
 }

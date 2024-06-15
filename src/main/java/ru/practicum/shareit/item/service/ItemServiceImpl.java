@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NoArgumentsException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.exception.UnsupportedArgumentException;
 import ru.practicum.shareit.item.dto.*;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -113,10 +112,15 @@ public class ItemServiceImpl implements ItemService {
 
         Item item = getById(itemId);
 
+        List<CommentDto> comments = commentRepository.findAllByItemId(itemId).stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
+
         ItemWithBookingsDto itemDto = ItemMapper.toItemWithBookingDto(item,
                 null,
                 null,
-                Collections.emptyList());
+                comments);
+
 
         if (item.getOwner().getId() != userId) {
             return itemDto;
@@ -155,11 +159,14 @@ public class ItemServiceImpl implements ItemService {
         for (Item i : itemList) {
             Booking lastBooking = bookingRepository.getLastBookingByItem(i.getId(), now, status);
             Booking nextBooking = bookingRepository.getNextBookingByItem(i.getId(), now, status);
+            List<CommentDto> comments = commentRepository.findAllByItemId(i.getId()).stream()
+                    .map(CommentMapper::toCommentDto)
+                    .collect(Collectors.toList());
 
             ItemWithBookingsDto item = ItemMapper.toItemWithBookingDto(i,
                     null,
                     null,
-                    Collections.emptyList());
+                    comments);
 
             if (lastBooking != null) item.setLastBooking(BookingMapper.toBookingWithIdAndBookerId(lastBooking.getId(),
                     lastBooking.getBooker().getId()));
