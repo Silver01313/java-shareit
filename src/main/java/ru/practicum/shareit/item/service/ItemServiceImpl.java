@@ -9,10 +9,11 @@ import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NoArgumentsException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
+import ru.practicum.shareit.exception.UnsupportedArgumentException;
+import ru.practicum.shareit.item.dto.*;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -31,14 +32,12 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
     private final UserService userService;
     private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
     public ItemDto create(Long userId, ItemDto item) {
 
-        if (userId == null) {
-            log.debug("Отсутствует идентификатор пользователя");
-            throw new NoArgumentsException("Отсутствует идентификатор пользователя");
-        }
+        checkUsrId(userId);
 
         if (item.getAvailable() == null) {
             log.debug("Отсутствует статус  доступности  предмета");
@@ -64,12 +63,35 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    public CommentDto createComment(Long userId, Long itemId, CommentDto comment) {
+
+        String status = "APPROVED";
+        LocalDateTime now = LocalDateTime.now();
+
+        checkUsrId(userId);
+        if(comment.getText().isBlank()) {
+            log.debug("Комментарий не может быть пуст");
+            throw new NoArgumentsException("Комментарий не может быть пуст");
+        }
+
+        User user = userService.get(userId);
+        Item item = getById(itemId);
+        Booking booking = bookingRepository.getBookingByBooker(itemId, userId, now, status);
+
+        if (booking == null) {
+            log.debug("Бронирование не найдено");
+            throw new NoArgumentsException("Бронирование не найдено");
+        }
+
+        Comment newComment = CommentMapper.toComment(comment , item, user, now);
+
+        return CommentMapper.toCommentDto(commentRepository.save(newComment));
+    }
+
+    @Override
     public ItemDto update(Long userId, Long itemId, ItemDto item) {
 
-        if (userId == null) {
-            log.debug("Отсутствует идентификатор пользователя");
-            throw new NoArgumentsException("Отсутствует идентификатор пользователя");
-        }
+        checkUsrId(userId);
 
         Item newItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Вещь не найдена"));
@@ -89,17 +111,19 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public ItemWithBookingsDto get(Long itemId, Long userId) {
 
-        Item item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
+        Item item = getById(itemId);
 
-        ItemWithBookingsDto itemDto = ItemMapper.toItemWithBookingDto(item,null,null);
+        ItemWithBookingsDto itemDto = ItemMapper.toItemWithBookingDto(item,
+                null,
+                null,
+                Collections.emptyList());
 
         if (item.getOwner().getId() != userId) {
             return itemDto;
         }
 
         String status = "APPROVED";
-        LocalDateTime now =LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         Booking lastBooking = bookingRepository.getLastBookingByItem(itemId, now, status);
         Booking nextBooking = bookingRepository.getNextBookingByItem(itemId, now, status);
 
@@ -113,21 +137,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getById(Long itemId) {
-        return itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
-    }
-
-    @Override
     public List<ItemWithBookingsDto> getAllItemsByUser(Long userId) {
 
-        if (userId == null) {
-            log.debug("Отсутствует идентификатор пользователя");
-            throw new NoArgumentsException("Отсутствует идентификатор пользователя");
-        }
+        checkUsrId(userId);
 
         String status = "APPROVED";
-        LocalDateTime now =LocalDateTime.now();
+        LocalDateTime now = LocalDateTime.now();
         List<Item> itemList = itemRepository.findAllByOwnerId(userId);
 
         if (itemList.isEmpty()) {
@@ -141,7 +156,10 @@ public class ItemServiceImpl implements ItemService {
             Booking lastBooking = bookingRepository.getLastBookingByItem(i.getId(), now, status);
             Booking nextBooking = bookingRepository.getNextBookingByItem(i.getId(), now, status);
 
-            ItemWithBookingsDto item = ItemMapper.toItemWithBookingDto(i,null,null);
+            ItemWithBookingsDto item = ItemMapper.toItemWithBookingDto(i,
+                    null,
+                    null,
+                    Collections.emptyList());
 
             if (lastBooking != null) item.setLastBooking(BookingMapper.toBookingWithIdAndBookerId(lastBooking.getId(),
                     lastBooking.getBooker().getId()));
@@ -158,5 +176,18 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getRequired(String text) {
         if (text.isBlank()) return Collections.emptyList();
         return itemRepository.getRequired(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public Item getById(Long itemId) {
+        return itemRepository.findById(itemId)
+                .orElseThrow(() -> new NotFoundException("Такой вещи не существует"));
+    }
+
+    private void checkUsrId(Long userId) {
+        if (userId == null) {
+            log.debug("Отсутствует идентификатор пользователя");
+            throw new NoArgumentsException("Отсутствует идентификатор пользователя");
+        }
     }
 }
