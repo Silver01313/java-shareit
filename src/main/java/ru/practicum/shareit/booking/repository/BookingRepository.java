@@ -6,7 +6,6 @@ import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long > {
 
@@ -111,49 +110,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long > {
             "ORDER BY b.start_time " +
             "LIMIT 1", nativeQuery = true)
     Booking getNextBookingByItem(long itemId, LocalDateTime now, String status);
-
-    @Query(value = "Select b.* from Bookings b " +
-            "WHERE b.item_id = ?1 " +
-            "AND b.start_time < ?2 " +
-            "AND b.end_time < ?2 " +
-            "AND b.status = ?3 " +
-            "ORDER BY b.start_time "
-             , nativeQuery = true)
-    List<Booking> getLastBookingsByItem(long itemId, LocalDateTime now, String status);
-
-    @Query(value = "Select b.* from Bookings b " +
-            "WHERE b.item_id = ?1 " +
-            "AND b.start_time > ?2 " +
-            "AND b.status = ?3 " +
-            "ORDER BY b.start_time "
-            , nativeQuery = true)
-    List<Booking> getNextBookingsByItem(long itemId, LocalDateTime now, String status);
-
-/*    @Query(value = "Select b from Booking b " +
-            "JOIN FETCH b.item i " +
-            "JOIN FETCH b.booker bk " +
-            "WHERE i.id = ?1 ")
-    List<Booking> getBookingsByItem(long itemId);
-
-    /*@Query("Select b from Booking b " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.start < ?2 " +
-            "AND b.end < ?2 " +
-            "AND b.status = ?3 " +
-            "ORDER BY b.start DESC")
-    List<Booking> getLastBookingByItem(long itemId, LocalDateTime now, String status);
-
-    @Query("Select b from Booking b " +
-            "WHERE b.item.id = ?1 " +
-            "AND b.start > ?2 " +
-            "AND b.status = ?3 " +
-            "ORDER BY b.start DESC" +
-            "LIMIT 1")
-    List<Booking> getNextBookingByItem(long itemId, LocalDateTime now, String status);*/
-
-/*    @Query(value = "Select b from Booking b " +
-            "JOIN FETCH b.item i " +
-            "JOIN FETCH b.booker bk " +
-            "WHERE i.id = ?1 ")
-    List<Booking> getBookingsByItem(long itemId);*/
 }

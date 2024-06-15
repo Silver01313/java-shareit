@@ -118,6 +118,7 @@ public class BookingServiceImpl implements BookingService {
             log.debug("Бронирование не найдено");
             throw new NotFoundException("Бронирование не найдено");
         }
+
         Booking booking = bookingRepository.findById(bookingId);
 
         User booker = booking.getBooker();
@@ -127,6 +128,7 @@ public class BookingServiceImpl implements BookingService {
             log.debug("У вас нет доступа к этому бронированию");
             throw new NotFoundException("У вас нет доступа к этому бронированию");
         }
+
         return BookingMapper.toBookingDto(booking);
     }
 
@@ -201,6 +203,5 @@ public class BookingServiceImpl implements BookingService {
 
         log.debug("Такой параметр не поддерживается");
         throw new UnsupportedArgumentException("Unknown state: UNSUPPORTED_STATUS");
-
     }
 }

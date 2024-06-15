@@ -32,15 +32,6 @@ public class BookingMapper {
         );
     }
 
-    public static BookingDtoWithoutTime toBookingDtoWithoutTime(Booking booking) {
-        return new BookingDtoWithoutTime(
-                booking.getId(),
-                ItemMapper.toItemDto(booking.getItem()),
-                UserMapper.toUserDto(booking.getBooker()),
-                booking.getStatus()
-        );
-    }
-
     public static BookingWithIdAndBookerId toBookingWithIdAndBookerId(long id, long bookerId) {
         return new BookingWithIdAndBookerId(
                 id,
