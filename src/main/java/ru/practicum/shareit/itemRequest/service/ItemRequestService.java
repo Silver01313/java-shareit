@@ -1,9 +1,9 @@
-package ru.practicum.shareit.request.service;
+package ru.practicum.shareit.itemRequest.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.request.model.ItemRequest;
-import ru.practicum.shareit.request.storage.ItemRequestStorage;
+import ru.practicum.shareit.itemRequest.model.ItemRequest;
+import ru.practicum.shareit.itemRequest.storage.ItemRequestStorage;
 
 @Service
 @RequiredArgsConstructor

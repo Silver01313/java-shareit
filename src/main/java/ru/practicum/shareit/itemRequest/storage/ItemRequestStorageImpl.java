@@ -1,8 +1,8 @@
-package ru.practicum.shareit.request.storage;
+package ru.practicum.shareit.itemRequest.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.request.model.ItemRequest;
+import ru.practicum.shareit.itemRequest.model.ItemRequest;
 
 import java.util.HashMap;
 
