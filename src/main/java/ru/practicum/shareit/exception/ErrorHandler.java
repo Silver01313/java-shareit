@@ -10,6 +10,10 @@ import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.storage.ItemStorageImpl;
+import ru.practicum.shareit.request.controller.RequestController;
+import ru.practicum.shareit.request.repository.RequestRepository;
+import ru.practicum.shareit.request.service.RequestService;
+import ru.practicum.shareit.request.service.RequestServiceImpl;
 import ru.practicum.shareit.user.controller.UserController;
 import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
@@ -21,7 +25,8 @@ import java.util.Map;
 @RestControllerAdvice(assignableTypes = {UserStorageImpl.class, UserService.class, UserController.class,
         UserServiceImpl.class, UserRepository.class, ItemStorageImpl.class, ItemStorageImpl.class,
         ItemController.class, BookingController.class, BookingService.class, BookingServiceImpl.class,
-        BookingRepository.class})
+        BookingRepository.class, RequestController.class, RequestService.class, RequestServiceImpl.class,
+        RequestRepository.class})
 
 public class ErrorHandler {
 

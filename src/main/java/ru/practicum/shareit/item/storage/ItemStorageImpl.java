@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.itemRequest.service.ItemRequestService;
+import ru.practicum.shareit.request.service.RequestServiceImpl;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -22,7 +22,7 @@ public class ItemStorageImpl implements ItemStorage {
 
     private final UserService userService;
 
-    private final ItemRequestService itemRequestService;
+    private final RequestServiceImpl requestService;
 
     private final HashMap<Long, Item> items;
 
@@ -32,12 +32,10 @@ public class ItemStorageImpl implements ItemStorage {
     public Item create(Long userId, ItemDto item) {
 
         User user = userService.get(userId);
-        Item newItem = ItemMapper.toItem(item);
+        Item newItem = ItemMapper.toItem(item, null);
 
         newItem.setId(++id);
         newItem.setOwner(user);
-        if (item.getRequest() != null)
-            newItem.setRequest(itemRequestService.get(item.getRequest()));
 
         items.put(id, newItem);
         log.info("Объект создан");

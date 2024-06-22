@@ -1,8 +1,8 @@
-package ru.practicum.shareit.itemRequest.storage;
+package ru.practicum.shareit.request.storage;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.itemRequest.model.ItemRequest;
+import ru.practicum.shareit.request.model.Request;
 
 import java.util.HashMap;
 
@@ -11,9 +11,9 @@ import java.util.HashMap;
 public class ItemRequestStorageImpl implements ItemRequestStorage {
 
 
-    private  final HashMap<Long, ItemRequest> requests;
+    private  final HashMap<Long, Request> requests;
 
-    public ItemRequest get(Long id) {
+    public Request get(Long id) {
         return requests.get(id);
     }
 }

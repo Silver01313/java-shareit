@@ -138,7 +138,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
-    public List<BookingDto> findAllByBookerId(long bookerId, String param) {
+    public List<BookingDto> findAllByBookerId(long bookerId, String param, int from, int size) {
 
         User booker = userService.get(bookerId);
         LocalDateTime now = LocalDateTime.now();
@@ -171,7 +171,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDto> findAllByOwnerItems(long ownerId, String param) {
+    public List<BookingDto> findAllByOwnerItems(long ownerId, String param, int from, int size) {
 
         User owner = userService.get(ownerId);
         LocalDateTime now = LocalDateTime.now();

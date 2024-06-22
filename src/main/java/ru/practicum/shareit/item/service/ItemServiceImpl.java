@@ -14,6 +14,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.model.Request;
+import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -32,6 +34,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final RequestRepository requestRepository;
 
     @Override
     public ItemDto create(Long userId, ItemDto item) {
@@ -54,7 +57,15 @@ public class ItemServiceImpl implements ItemService {
         }
 
         User user = userService.get(userId);
-        Item newItem = ItemMapper.toItem(item);
+        Item newItem;
+
+        if (item.getRequestId() != null) {
+           Request request = requestRepository.findById(item.getRequestId())
+                    .orElseThrow(()-> new NotFoundException("Запрос не найден"));
+            newItem = ItemMapper.toItem(item, request);
+        } else {
+            newItem = ItemMapper.toItem(item, null);
+        }
 
         newItem.setOwner(user);
 
@@ -153,7 +164,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemWithBookingsDto> getAllItemsByUser(Long userId) {
+    public List<ItemWithBookingsDto> getAllItemsByUser(Long userId, int from, int size) {
 
         checkUsrId(userId);
 
@@ -196,7 +207,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> getRequired(String text) {
+    public List<ItemDto> getRequired(String text, int from, int size) {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
