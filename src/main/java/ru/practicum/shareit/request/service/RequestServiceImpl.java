@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -18,7 +19,6 @@ import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,8 +73,11 @@ public class RequestServiceImpl implements RequestService {
         checkUsrId(requestorId);
         userService.get(requestorId);
 
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
 
-        List<Request> requests = requestRepository.findAll(requestorId);
+        Page<Request> requestsPage = requestRepository.findAll(requestorId, pageable);
+        List<Request> requests = requestsPage.getContent();
         List<Long> requestsId = requests.stream().map(Request::getId).collect(Collectors.toList());
         List<Item> items =  itemRepository.findAllByRequestId(requestsId);
         List<RequestDto> requestsDto = new ArrayList<>();

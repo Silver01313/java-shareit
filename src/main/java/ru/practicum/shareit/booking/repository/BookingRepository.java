@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 
@@ -13,85 +15,124 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking findById(long bookingId);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE bk.id = ?1 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerId(long bookerId);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.booker bk " +
+                    "WHERE bk.id = ?1 ")
+    Page<Booking> findAllByBookerId(long bookerId, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE bk.id = ?1 " +
             "AND b.start < ?2 " +
             "AND b.end > ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllCurrentByBookerId(long bookerId, LocalDateTime now);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.booker bk " +
+                    "WHERE bk.id = ?1 " +
+                    "AND b.start < ?2 ")
+    Page<Booking> findAllCurrentByBookerId(long bookerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "SELECT b FROM Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE bk.id = ?1 " +
             "AND b.end < ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllPastByBookerId(long bookerId, LocalDateTime now);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "WHERE b.booker.id = ?1 " +
+                    "AND b.end < ?2")
+    Page<Booking> findAllPastByBookerId(long bookerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE bk.id = ?1 " +
             "AND b.start > ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllFutureByBookerId(long bookerId, LocalDateTime now);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.booker bk " +
+                    "WHERE bk.id = ?1 " +
+                    "AND b.start > ?2 ")
+    Page<Booking> findAllFutureByBookerId(long bookerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE bk.id = ?1 " +
             "AND b.status = ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByBookerIdByStatus(long bookerId, String status);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.booker bk " +
+                    "WHERE bk.id = ?1 " +
+                    "AND b.status = ?2 ")
+    Page<Booking> findAllByBookerIdByStatus(long bookerId, String status, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE i.owner.id = ?1 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerItems(long ownerId);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.item i " +
+                    "WHERE i.owner.id = ?1 ")
+    Page<Booking> findAllByOwnerItems(long ownerId, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE i.owner.id = ?1 " +
             "AND b.start < ?2 " +
             "AND b.end > ?2 " +
-            "ORDER BY b.start ")
-    List<Booking> findAllCurrentByOwnerItems(long ownerId, LocalDateTime now);
+            "ORDER BY b.start ",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.item i " +
+                    "WHERE i.owner.id = ?1 " +
+                    "AND b.start < ?2 " +
+                    "AND b.end > ?2 ")
+    Page<Booking> findAllCurrentByOwnerItems(long ownerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
-            "JOIN FETCH b.item i " +
-            "JOIN FETCH b.booker bk " +
-            "WHERE i.owner.id = ?1 " +
-            "AND b.end < ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllPastByOwnerItems(long ownerId, LocalDateTime now);
+  @Query(value = "SELECT b FROM Booking b " +
+          "JOIN FETCH b.item i " +
+          "JOIN FETCH b.booker bk " +
+          "WHERE i.owner.id = ?1 " +
+          "AND b.end < ?2 " +
+          "ORDER BY b.start DESC",
+          countQuery = "SELECT count(b) FROM Booking b " +
+                  "JOIN b.item i " +
+                  "JOIN i.owner o " +
+                  "WHERE b.item.owner.id = ?1 " +
+                  "AND b.end < ?2")
+    Page<Booking> findAllPastByOwnerItems(long ownerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE i.owner.id = ?1 " +
             "AND b.start > ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllFutureByOwnerItems(long ownerId, LocalDateTime now);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+                    "JOIN b.item i " +
+                    "WHERE i.owner.id = ?1 " +
+                    "AND b.start > ?2 ")
+    Page<Booking> findAllFutureByOwnerItems(long ownerId, LocalDateTime now, Pageable pageable);
 
-    @Query("Select b from Booking b " +
+    @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +
             "WHERE i.owner.id = ?1 " +
             "AND b.status = ?2 " +
-            "ORDER BY b.start DESC")
-    List<Booking> findAllByOwnerItemsByStatus(long ownerId, String status);
+            "ORDER BY b.start DESC",
+            countQuery = "SELECT count(b) FROM Booking b " +
+            "JOIN b.item i " +
+                    "WHERE i.owner.id = ?1 " +
+                    "AND b.status = ?2 ")
+    Page<Booking> findAllByOwnerItemsByStatus(long ownerId, String status, Pageable pageable);
 
     @Query(value = "Select b.* from Bookings b " +
             "WHERE b.item_id = ?1 " +

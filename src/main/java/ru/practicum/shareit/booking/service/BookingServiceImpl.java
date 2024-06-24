@@ -2,6 +2,9 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoFromFrontend;
@@ -142,27 +145,34 @@ public class BookingServiceImpl implements BookingService {
 
         User booker = userService.get(bookerId);
         LocalDateTime now = LocalDateTime.now();
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        Page<Booking> bookingsPage;
 
         switch (param) {
             case ("ALL"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
+                bookingsPage = bookingRepository.findAllByBookerId(bookerId, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("CURRENT"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
+                bookingsPage = bookingRepository.findAllCurrentByBookerId(bookerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("PAST"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
+                bookingsPage = bookingRepository.findAllPastByBookerId(bookerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("FUTURE"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
+                bookingsPage = bookingRepository.findAllFutureByBookerId(bookerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("WAITING"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByBookerIdByStatus(bookerId, "WAITING"));
+                bookingsPage = bookingRepository.findAllByBookerIdByStatus(bookerId, "WAITING", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("REJECTED"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByBookerIdByStatus(bookerId, "REJECTED"));
+                bookingsPage = bookingRepository.findAllByBookerIdByStatus(bookerId, "REJECTED", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             default:
                 log.debug("Такой параметр не поддерживается");
@@ -175,27 +185,34 @@ public class BookingServiceImpl implements BookingService {
 
         User owner = userService.get(ownerId);
         LocalDateTime now = LocalDateTime.now();
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Booking> bookingsPage;
 
         switch (param) {
             case ("ALL"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
+                bookingsPage = bookingRepository.findAllByOwnerItems(ownerId, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("CURRENT"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
+                bookingsPage = bookingRepository.findAllCurrentByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("PAST"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
+                bookingsPage = bookingRepository.findAllPastByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("FUTURE"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
+                bookingsPage = bookingRepository.findAllFutureByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("WAITING"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
+                bookingsPage = bookingRepository.findAllByOwnerItemsByStatus(ownerId, "WAITING", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             case ("REJECTED"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
+                bookingsPage = bookingRepository.findAllByOwnerItemsByStatus(ownerId, "REJECTED", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             default:
                 log.debug("Такой параметр не поддерживается");

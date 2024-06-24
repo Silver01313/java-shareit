@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -170,7 +172,9 @@ public class ItemServiceImpl implements ItemService {
 
         String status = "APPROVED";
         LocalDateTime now = LocalDateTime.now();
-        List<Item> itemList = itemRepository.findAllByOwnerId(userId);
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        List<Item> itemList = itemRepository.findAllByOwnerId(userId, pageable);
 
         if (itemList.isEmpty()) {
             log.debug("У вас нет вещей");
@@ -211,7 +215,11 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return Collections.emptyList();
         }
-        return itemRepository.getRequired(text).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        return itemRepository.getRequired(text, pageable).stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
