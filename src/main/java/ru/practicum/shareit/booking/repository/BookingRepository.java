@@ -7,14 +7,10 @@ import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking save(Booking booking);
-
-    Booking findById(long bookingId);
-
     @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +

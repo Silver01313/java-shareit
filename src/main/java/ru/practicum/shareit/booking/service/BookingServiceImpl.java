@@ -58,8 +58,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (start.isBefore(now)) {
-            log.debug("Время начала не может быть в будущем");
-            throw new ValidationException("Время начала не может быть в будущем");
+            log.debug("Время начала не может быть в прошлом");
+            throw new ValidationException("Время начала не может быть в прошлом");
         }
 
         if (start.isAfter(end)) {
@@ -88,12 +88,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto update(long ownerId, long bookingId, boolean approved) {
 
-        if (bookingRepository.findById(bookingId) == null) {
-            log.debug("Бронирование не найдено");
-            throw new NotFoundException("Бронирование не найдено");
-        }
-
-        Booking booking = bookingRepository.findById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(()->new NotFoundException("Бронирование не найдено"));
 
         if (booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
             log.debug("Подверждение уже прошло");
@@ -121,12 +117,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBooking(long userId, long bookingId) {
 
-        if (bookingRepository.findById(bookingId) == null) {
-            log.debug("Бронирование не найдено");
-            throw new NotFoundException("Бронирование не найдено");
-        }
-
-        Booking booking = bookingRepository.findById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(()-> new NotFoundException("Бронирование не найдено"));
 
         User booker = booking.getBooker();
         User owner = booking.getItem().getOwner();
@@ -138,7 +130,6 @@ public class BookingServiceImpl implements BookingService {
 
         return BookingMapper.toBookingDto(booking);
     }
-
 
     @Override
     public List<BookingDto> findAllByBookerId(long bookerId, String param, int from, int size) {

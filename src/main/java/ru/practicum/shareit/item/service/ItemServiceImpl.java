@@ -16,6 +16,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.item.storage.ItemStorageImpl;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
@@ -62,8 +63,8 @@ public class ItemServiceImpl implements ItemService {
         Item newItem;
 
         if (item.getRequestId() != null) {
-           Request request = requestRepository.findById(item.getRequestId())
-                    .orElseThrow(()-> new NotFoundException("Запрос не найден"));
+            Request request = requestRepository.findById(item.getRequestId())
+                            .orElseThrow(() -> new NotFoundException("Запрос не найден"));
             newItem = ItemMapper.toItem(item, request);
         } else {
             newItem = ItemMapper.toItem(item, null);
@@ -81,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
 
         checkUsrId(userId);
-        if (comment.getText().isBlank()) {
+        if (comment.equals(new CommentDto()) || comment.getText().isBlank()) {
             log.debug("Комментарий не может быть пуст");
             throw new ValidationException("Комментарий не может быть пуст");
         }

@@ -13,8 +13,6 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     Request save (Request request);
 
-    Request findById(long requestId);
-
     @Query("Select r from Request r " +
             "WHERE r.requestor.id = :requestorId " +
             "ORDER BY r.created DESC")
