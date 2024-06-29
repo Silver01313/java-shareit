@@ -202,7 +202,6 @@ public class BookingRepositoryTest {
 
         Booking result = bookingRepository.getLastBookingByItem(user.getId(), now, "APPROVED");
 
-        assertNotNull(result);
         assertEquals(result, booking2);
     }
 
