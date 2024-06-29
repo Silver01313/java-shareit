@@ -151,7 +151,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "AND b.booker_id = ?2 " +
             "AND b.end_time < ?3 " +
             "AND b.status = ?4 " +
-            "ORDER BY b.start_time " +
+            "ORDER BY b.end_time " +
             "LIMIT 1", nativeQuery = true)
     Booking getBookingByBooker(long itemId, long bookerId, LocalDateTime now, String status);
 }

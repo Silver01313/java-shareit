@@ -36,11 +36,11 @@ import static org.mockito.Mockito.*;
 public class BookingServiceImplTest {
 
     @Mock
-    private  BookingRepository bookingRepository;
+    private BookingRepository bookingRepository;
     @Mock
-    private  ItemService itemService;
+    private ItemService itemService;
     @Mock
-    private  UserService userService;
+    private UserService userService;
     @InjectMocks
     private BookingServiceImpl bookingService;
 
@@ -198,13 +198,13 @@ public class BookingServiceImplTest {
         assertEquals(positiverResult.getItem().getId(), nextBooking.getItem().getId());
         assertEquals(positiverResult.getBooker().getId(), nextBooking.getBooker().getId());
         assertEquals(positiverResult.getBooker().getId(), nextBooking.getBooker().getId());
-        assertEquals(positiverResult.getStatus(),"APPROVED");
+        assertEquals(positiverResult.getStatus(), "APPROVED");
 
         nextBooking.setStatus("null");
         BookingDto negativeResult = bookingService.update(user2.getId(), nextBooking.getId(), false);
 
         assertNotNull(positiverResult);
-        assertEquals(negativeResult.getStatus(),"REJECTED");
+        assertEquals(negativeResult.getStatus(), "REJECTED");
     }
 
     @Test
@@ -229,7 +229,7 @@ public class BookingServiceImplTest {
     void getBookingShouldThrowExceptionWhenNoValidate() {
         when(bookingRepository.findById(99L)).thenThrow(new NotFoundException("Бронирование не найдено"));
 
-        assertThrows(NotFoundException.class, () -> bookingService.getBooking(user.getId(),99L));
+        assertThrows(NotFoundException.class, () -> bookingService.getBooking(user.getId(), 99L));
 
         when(bookingRepository.findById(nextBooking.getId())).thenReturn(Optional.of(nextBooking));
 
@@ -240,7 +240,7 @@ public class BookingServiceImplTest {
     void findAllByBookerIdShouldReturnListOfBookingDto() {
         when(userService.get(user.getId())).thenReturn(user);
 
-        List<Booking> bookings = List.of(lastBooking,currentBooking,nextBooking);
+        List<Booking> bookings = List.of(lastBooking, currentBooking, nextBooking);
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<Booking> bookingsPage = new PageImpl<>(bookings, pageRequest, bookings.size());
 
@@ -317,7 +317,7 @@ public class BookingServiceImplTest {
 
         when(userService.get(user.getId())).thenReturn(user);
 
-        List<Booking> bookings = List.of(lastBooking,currentBooking,nextBooking);
+        List<Booking> bookings = List.of(lastBooking, currentBooking, nextBooking);
         PageRequest pageRequest = PageRequest.of(0, 10);
         Page<Booking> bookingsPage = new PageImpl<>(bookings, pageRequest, bookings.size());
 

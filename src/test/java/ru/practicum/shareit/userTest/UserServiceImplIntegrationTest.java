@@ -26,20 +26,20 @@ public class UserServiceImplIntegrationTest {
     @Test
     void createShouldSaveInDatabase() {
 
-    User newUser = new User();
-         newUser.setName("И");
-         newUser.setEmail("i@e.com");
+        User newUser = new User();
+        newUser.setName("И");
+        newUser.setEmail("i@e.com");
 
-    UserDto createdUser = service.create(newUser);
+        UserDto createdUser = service.create(newUser);
 
-    assertEquals(newUser.getName(), createdUser.getName());
-    assertEquals(newUser.getEmail(), createdUser.getEmail());
+        assertEquals(newUser.getName(), createdUser.getName());
+        assertEquals(newUser.getEmail(), createdUser.getEmail());
 
-    User savedUser = em.find(User.class, createdUser.getId());
+        User savedUser = em.find(User.class, createdUser.getId());
 
-    assertNotNull(savedUser);
-    assertEquals(newUser.getName(), savedUser.getName());
-    assertEquals(newUser.getEmail(), savedUser.getEmail());
- }
+        assertNotNull(savedUser);
+        assertEquals(newUser.getName(), savedUser.getName());
+        assertEquals(newUser.getEmail(), savedUser.getEmail());
+    }
 
 }

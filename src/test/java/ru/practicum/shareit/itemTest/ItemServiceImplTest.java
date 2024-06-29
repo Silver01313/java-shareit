@@ -232,7 +232,7 @@ public class ItemServiceImplTest {
         itemDto.setNextBooking(BookingMapper.toBookingWithIdAndBookerId(nextBooking.getId(),
                 nextBooking.getBooker().getId()));
 
-        when(itemRepository.findAllByOwnerId(anyLong(),any())).thenReturn(List.of(item));
+        when(itemRepository.findAllByOwnerId(anyLong(), any())).thenReturn(List.of(item));
         when(bookingRepository.getLastBookingByItem(anyLong(), any(), anyString()))
                 .thenReturn(lastBooking);
         when(bookingRepository.getNextBookingByItem(anyLong(), any(), anyString()))
