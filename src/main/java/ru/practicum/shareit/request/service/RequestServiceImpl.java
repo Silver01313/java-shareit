@@ -56,9 +56,9 @@ public class RequestServiceImpl implements RequestService {
         List<Item> items =  itemRepository.findAllByRequestId(requestsId);
         List<RequestDto> requestsDto = new ArrayList<>();
 
-        for(Request r : requests) {
+        for (Request r : requests) {
            List<ItemDto> itemsDto = items.stream()
-                   .filter(item-> item.getRequest().getId() == r.getId())
+                   .filter(item -> item.getRequest().getId() == r.getId())
                    .map(ItemMapper::toItemDto)
                    .collect(Collectors.toList());
 
@@ -82,9 +82,9 @@ public class RequestServiceImpl implements RequestService {
         List<Item> items =  itemRepository.findAllByRequestId(requestsId);
         List<RequestDto> requestsDto = new ArrayList<>();
 
-        for(Request r : requests) {
+        for (Request r : requests) {
             List<ItemDto> itemsDto = items.stream()
-                    .filter(item-> item.getRequest().getId() == r.getId())
+                    .filter(item -> item.getRequest().getId() == r.getId())
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
 
@@ -99,7 +99,7 @@ public class RequestServiceImpl implements RequestService {
         userService.get(requestorId);
 
         Request request = requestRepository.findById(requestId)
-                .orElseThrow(()-> new NotFoundException("Запрос не найден"));
+                .orElseThrow(() -> new NotFoundException("Запрос не найден"));
 
         List<ItemDto> items = itemRepository.findAllByRequestId(List.of(requestId)).stream()
                 .map(ItemMapper::toItemDto)

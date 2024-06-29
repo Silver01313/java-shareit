@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking save(Booking booking);
+
     @Query(value = "Select b from Booking b " +
             "JOIN FETCH b.item i " +
             "JOIN FETCH b.booker bk " +

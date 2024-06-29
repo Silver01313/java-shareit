@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface RequestRepository extends JpaRepository<Request, Long> {
 
-    Request save (Request request);
+    Request save(Request request);
 
     @Query("Select r from Request r " +
             "WHERE r.requestor.id = :requestorId " +

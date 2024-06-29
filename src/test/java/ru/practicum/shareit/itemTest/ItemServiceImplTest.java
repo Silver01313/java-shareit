@@ -145,7 +145,7 @@ public class ItemServiceImplTest {
     }
 
     @Test
-    void ShouldThrowExceptionIfCommentIsEmpty() {
+    void shouldThrowExceptionIfCommentIsEmpty() {
         CommentDto comment = new CommentDto();
         assertThrows(ValidationException.class, () -> itemService.createComment(user.getId(), item.getId(), comment));
     }

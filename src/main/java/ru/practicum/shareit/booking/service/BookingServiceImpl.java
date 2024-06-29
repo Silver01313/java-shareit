@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto update(long ownerId, long bookingId, boolean approved) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()->new NotFoundException("Бронирование не найдено"));
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
         if (booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
             log.debug("Подверждение уже прошло");
@@ -118,7 +118,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingDto getBooking(long userId, long bookingId) {
 
         Booking booking = bookingRepository.findById(bookingId)
-                .orElseThrow(()-> new NotFoundException("Бронирование не найдено"));
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
         User booker = booking.getBooker();
         User owner = booking.getItem().getOwner();
