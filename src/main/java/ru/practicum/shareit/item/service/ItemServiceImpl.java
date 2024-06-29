@@ -58,15 +58,14 @@ public class ItemServiceImpl implements ItemService {
         }
 
         User user = userService.get(userId);
-        Item newItem;
+        Request request = null;
 
         if (item.getRequestId() != null) {
-            Request request = requestRepository.findById(item.getRequestId())
-                            .orElseThrow(() -> new NotFoundException("Запрос не найден"));
-            newItem = ItemMapper.toItem(item, request);
-        } else {
-            newItem = ItemMapper.toItem(item, null);
+            request = requestRepository.findById(item.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Запрос не найден"));
         }
+
+        Item newItem = ItemMapper.toItem(item, request);
 
         newItem.setOwner(user);
 

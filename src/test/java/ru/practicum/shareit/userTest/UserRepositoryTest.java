@@ -24,5 +24,6 @@ public class UserRepositoryTest {
         User savedUser = userRepository.save(user);
 
         assertEquals(savedUser.getName(), "name");
+        assertEquals(savedUser.getEmail(), "s@y.com");
     }
 }
