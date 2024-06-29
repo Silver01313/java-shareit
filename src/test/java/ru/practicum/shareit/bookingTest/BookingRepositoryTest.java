@@ -18,7 +18,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@DataJpaTest(properties = "db.name=test")
+@DataJpaTest()
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class BookingRepositoryTest {
 
@@ -29,7 +29,6 @@ public class BookingRepositoryTest {
     User user;
     User user2;
     Item item;
-    Item item2;
     Booking booking;
     Booking booking2;
     Pageable pageable;
@@ -54,12 +53,6 @@ public class BookingRepositoryTest {
         item.setAvailable(true);
         item.setOwner(user);
 
-        item2 = new Item();
-        item2.setName("n2");
-        item2.setDescription("d2");
-        item2.setAvailable(true);
-        item2.setOwner(user);
-
         booking = new Booking();
         booking.setStart(LocalDateTime.now().plusDays(1));
         booking.setEnd(LocalDateTime.now().plusDays(2));
@@ -77,7 +70,6 @@ public class BookingRepositoryTest {
         em.persist(user);
         em.persist(user2);
         em.persist(item);
-        em.persist(item2);
         em.persist(booking);
         em.persist(booking2);
     }
@@ -199,7 +191,7 @@ public class BookingRepositoryTest {
         booking.setStart(LocalDateTime.now().minusDays(3));
         booking2.setStart(LocalDateTime.now().minusDays(2));
 
-        Booking result = bookingRepository.getLastBookingByItem(user.getId(), now, "APPROVED");
+        Booking result = bookingRepository.getLastBookingByItem(item.getId(), now, "APPROVED");
 
         assertEquals(result, booking2);
     }
@@ -208,7 +200,7 @@ public class BookingRepositoryTest {
     public void shouldGetNextBookingByItem() {
         booking2.setBooker(user);
 
-        Booking result = bookingRepository.getNextBookingByItem(user.getId(), now, "APPROVED");
+        Booking result = bookingRepository.getNextBookingByItem(item.getId(), now, "APPROVED");
 
         assertEquals(result, booking);
     }
