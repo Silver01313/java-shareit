@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -19,33 +18,34 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class ShareItTests {
 
-	@Mock
-	private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-	@InjectMocks
-	private UserServiceImpl userService;
+    @InjectMocks
+    private UserServiceImpl userService;
 
-	private User user;
-	private UserDto userDto;
-	@BeforeEach
-	void createUser() {
-		user = new User();
-		user.setId(1L);
-		user.setName("TestName");
-		user.setEmail("test@example.com");
+    private User user;
+    private UserDto userDto;
 
-		userDto = new UserDto(user.getId(), user.getName(), user.getEmail());
-	}
+    @BeforeEach
+    void createUser() {
+        user = new User();
+        user.setId(1L);
+        user.setName("TestName");
+        user.setEmail("test@example.com");
 
-	@Test
-	void createShouldReturnUserDto() {
-		when(userRepository.save(user)).thenReturn(user);
+        userDto = new UserDto(user.getId(), user.getName(), user.getEmail());
+    }
 
-		UserDto result = userService.create(user);
+    @Test
+    void createShouldReturnUserDto() {
+        when(userRepository.save(user)).thenReturn(user);
 
-		assertNotNull(result);
-		assertEquals(userDto.getName(), result.getName());
-		assertEquals(userDto.getEmail(), result.getEmail());
-	}
+        UserDto result = userService.create(user);
+
+        assertNotNull(result);
+        assertEquals(userDto.getName(), result.getName());
+        assertEquals(userDto.getEmail(), result.getEmail());
+    }
 
 }

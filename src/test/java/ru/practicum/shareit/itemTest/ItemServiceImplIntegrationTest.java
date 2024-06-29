@@ -39,6 +39,7 @@ public class ItemServiceImplIntegrationTest {
         newUser.setName("И");
         newUser.setEmail("i@e.com");
     }
+
     @Test
     void createShouldSaveInDatabase() {
 
@@ -81,7 +82,7 @@ public class ItemServiceImplIntegrationTest {
 
         Comment comment = CommentMapper.toComment(commentDto, item, newUser, LocalDateTime.now());
 
-        Comment createdComment= commentRepository.save(comment);
+        Comment createdComment = commentRepository.save(comment);
 
         assertNotNull(createdComment);
         assertEquals(createdComment.getId(), comment.getId());

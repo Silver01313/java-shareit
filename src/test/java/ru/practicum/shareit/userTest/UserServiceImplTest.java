@@ -28,6 +28,7 @@ public class UserServiceImplTest {
 
     private User user;
     private UserDto userDto;
+
     @BeforeEach
     void createUser() {
         user = new User();
