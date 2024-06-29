@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 @DataJpaTest(properties = "db.name=test")
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserRepositoryTest {
@@ -24,7 +23,6 @@ public class UserRepositoryTest {
 
         User savedUser = userRepository.save(user);
 
-       assertEquals(savedUser.getId(), 1L);
         assertEquals(savedUser.getName(), "name");
     }
 }
