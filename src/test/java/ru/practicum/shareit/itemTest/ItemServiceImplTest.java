@@ -12,7 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
@@ -181,7 +180,7 @@ public class ItemServiceImplTest {
         assertThrows(NotFoundException.class, () -> itemService.update(user.getId(), 99L, itemDto));
 
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
-        assertThrows(NoAccessException.class, () -> itemService.update(2L, item.getId(), itemDto));
+        assertThrows(NotFoundException.class, () -> itemService.update(2L, item.getId(), itemDto));
     }
 
     @Test
