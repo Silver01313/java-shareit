@@ -35,26 +35,8 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNoArguments(NoArgumentsException e) {
-        return Map.of("Не корректный запрос", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleNoArguments(ValidationException e) {
         return Map.of("error", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleNoArguments(UnsupportedArgumentException e) {
-        return Map.of("error", e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public Map<String, String> handleNoAcces(NoAccessException e) {
-        return Map.of("У вас нет доступа", e.getMessage());
     }
 
     @ExceptionHandler

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.NoAccessException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
 import ru.practicum.shareit.item.dto.*;
@@ -110,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
 
         if (userId != newItem.getOwner().getId()) {
             log.debug("Вы не являетесь владельцем вещи");
-            throw new NoAccessException("Вы не являетесь владельцем вещи");
+            throw new NotFoundException("Вы не являетесь владельцем вещи");
         }
 
         if (item.getName() != null) {
