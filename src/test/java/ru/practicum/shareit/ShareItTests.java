@@ -47,5 +47,4 @@ class ShareItTests {
         assertEquals(userDto.getName(), result.getName());
         assertEquals(userDto.getEmail(), result.getEmail());
     }
-
 }

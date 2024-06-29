@@ -212,7 +212,6 @@ public class BookingRepositoryTest {
 
         Booking result = bookingRepository.getNextBookingByItem(user.getId(), now, "APPROVED");
 
-        assertNotNull(result);
         assertEquals(result, booking);
     }
 
@@ -224,7 +223,6 @@ public class BookingRepositoryTest {
 
         Booking result = bookingRepository.getBookingByBooker(item.getId(), user.getId(), now, "APPROVED");
 
-        assertNotNull(result);
         assertEquals(result, booking);
     }
 }
