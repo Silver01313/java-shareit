@@ -2,7 +2,11 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.booking.BookingArgument;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoFromFrontend;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -55,8 +59,8 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (start.isBefore(now)) {
-            log.debug("Время начала не может быть в будущем");
-            throw new ValidationException("Время начала не может быть в будущем");
+            log.debug("Время начала не может быть в прошлом");
+            throw new ValidationException("Время начала не может быть в прошлом");
         }
 
         if (start.isAfter(end)) {
@@ -85,12 +89,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto update(long ownerId, long bookingId, boolean approved) {
 
-        if (bookingRepository.findById(bookingId) == null) {
-            log.debug("Бронирование не найдено");
-            throw new NotFoundException("Бронирование не найдено");
-        }
-
-        Booking booking = bookingRepository.findById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
         if (booking.getStatus().equals("APPROVED") || booking.getStatus().equals("REJECTED")) {
             log.debug("Подверждение уже прошло");
@@ -118,12 +118,8 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public BookingDto getBooking(long userId, long bookingId) {
 
-        if (bookingRepository.findById(bookingId) == null) {
-            log.debug("Бронирование не найдено");
-            throw new NotFoundException("Бронирование не найдено");
-        }
-
-        Booking booking = bookingRepository.findById(bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Бронирование не найдено"));
 
         User booker = booking.getBooker();
         User owner = booking.getItem().getOwner();
@@ -136,66 +132,92 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(booking);
     }
 
-
     @Override
-    public List<BookingDto> findAllByBookerId(long bookerId, String param) {
+    public List<BookingDto> findAllByBookerId(long bookerId, String param, int from, int size) {
 
         User booker = userService.get(bookerId);
         LocalDateTime now = LocalDateTime.now();
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(pageNumber, size);
+        Page<Booking> bookingsPage;
+        BookingArgument constParam = BookingArgument.getParam(param);
 
-        switch (param) {
-            case ("ALL"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByBookerId(bookerId));
-
-            case ("CURRENT"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByBookerId(bookerId, now));
-
-            case ("PAST"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByBookerId(bookerId, now));
-
-            case ("FUTURE"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByBookerId(bookerId, now));
-
-            case ("WAITING"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByBookerIdByStatus(bookerId, "WAITING"));
-
-            case ("REJECTED"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByBookerIdByStatus(bookerId, "REJECTED"));
-
-            default:
-                log.debug("Такой параметр не поддерживается");
-                throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        if (constParam == null) {
+            log.debug("Такой параметр не поддерживается");
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
         }
+
+            switch (constParam) {
+                case ALL:
+                    bookingsPage = bookingRepository.findAllByBookerId(bookerId, pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                case CURRENT:
+                    bookingsPage = bookingRepository.findAllCurrentByBookerId(bookerId, now, pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                case PAST:
+                    bookingsPage = bookingRepository.findAllPastByBookerId(bookerId, now, pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                case FUTURE:
+                    bookingsPage = bookingRepository.findAllFutureByBookerId(bookerId, now, pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                case WAITING:
+                    bookingsPage = bookingRepository.findAllByBookerIdByStatus(bookerId, "WAITING", pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                case REJECTED:
+                    bookingsPage = bookingRepository.findAllByBookerIdByStatus(bookerId, "REJECTED", pageable);
+                    return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+                default:
+                    log.debug("Такой параметр не поддерживается");
+                    throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+            }
     }
 
+
     @Override
-    public List<BookingDto> findAllByOwnerItems(long ownerId, String param) {
+    public List<BookingDto> findAllByOwnerItems(long ownerId, String param, int from, int size) {
 
         User owner = userService.get(ownerId);
         LocalDateTime now = LocalDateTime.now();
+        int pageNumber = from / size;
+        Pageable pageable = PageRequest.of(from, size);
+        Page<Booking> bookingsPage;
+        BookingArgument constParam = BookingArgument.getParam(param);
 
-        switch (param) {
-            case ("ALL"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllByOwnerItems(ownerId));
+        if (constParam == null) {
+            log.debug("Такой параметр не поддерживается");
+            throw new ValidationException("Unknown state: UNSUPPORTED_STATUS");
+        }
 
-            case ("CURRENT"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllCurrentByOwnerItems(ownerId, now));
+        switch (constParam) {
+            case ALL:
+                bookingsPage = bookingRepository.findAllByOwnerItems(ownerId, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
-            case ("PAST"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllPastByOwnerItems(ownerId, now));
+            case CURRENT:
+                bookingsPage = bookingRepository.findAllCurrentByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
-            case ("FUTURE"):
-                return BookingMapper.collectionToBookingDto(bookingRepository.findAllFutureByOwnerItems(ownerId, now));
+            case PAST:
+                bookingsPage = bookingRepository.findAllPastByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
-            case ("WAITING"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByOwnerItemsByStatus(ownerId, "WAITING"));
+            case FUTURE:
+                bookingsPage = bookingRepository.findAllFutureByOwnerItems(ownerId, now, pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
-            case ("REJECTED"):
-                return BookingMapper.collectionToBookingDto(bookingRepository
-                        .findAllByOwnerItemsByStatus(ownerId, "REJECTED"));
+            case WAITING:
+                bookingsPage = bookingRepository.findAllByOwnerItemsByStatus(ownerId, "WAITING", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
+
+            case REJECTED:
+                bookingsPage = bookingRepository.findAllByOwnerItemsByStatus(ownerId, "REJECTED", pageable);
+                return BookingMapper.collectionToBookingDto(bookingsPage.getContent());
 
             default:
                 log.debug("Такой параметр не поддерживается");

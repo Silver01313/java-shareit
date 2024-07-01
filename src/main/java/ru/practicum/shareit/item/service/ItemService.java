@@ -19,7 +19,7 @@ public interface ItemService {
 
     Item getById(Long itemId);
 
-    List<ItemWithBookingsDto> getAllItemsByUser(Long userId);
+    List<ItemWithBookingsDto> getAllItemsByUser(Long userId, int from, int size);
 
-    List<ItemDto> getRequired(String query);
+    List<ItemDto> getRequired(String query, int from, int size);
 }
