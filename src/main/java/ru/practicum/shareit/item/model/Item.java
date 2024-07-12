@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.itemRequest.model.ItemRequest;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.*;
@@ -31,9 +31,9 @@ public class Item {
     @JoinColumn(name = "owner_id")
     @NotNull
     private User owner;
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_request_id")
-    private ItemRequest request;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "request_id")
+    private Request request;
 
     public boolean isAvailable() {
         return available;

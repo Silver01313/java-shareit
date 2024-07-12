@@ -27,8 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(User user, Long userId) {
-        User newUser = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+        User newUser = get(userId);
 
         if (user.getName() != null) {
             newUser.setName(user.getName());
@@ -51,7 +50,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User get(long userId) {
-        if (!userRepository.findAll().contains(userRepository.findById(userId))) {
+        if (userRepository.findById(userId) == null) {
             log.debug("Такого пользователя не существует");
             throw new NotFoundException("Такого пользователя не существует");
         }
@@ -63,16 +62,4 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(userId);
     }
 
-    private boolean isUserAlreadyExist(User user) {
-        return userRepository.findAll().stream()
-                .map(User::getEmail)
-                .anyMatch(email -> email.equals(user.getEmail()));
-    }
-
-    private boolean isEmailAlreadyExistsWhenUpdatesUser(User user, Long userId) {
-        return userRepository.findAll().stream()
-                .filter(v -> v.getId() != userId)
-                .map(User::getEmail)
-                .anyMatch(email -> email.equals(user.getEmail()));
-    }
 }

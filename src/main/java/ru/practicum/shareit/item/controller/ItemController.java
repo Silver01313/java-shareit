@@ -1,14 +1,18 @@
 package ru.practicum.shareit.item.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemWithBookingsDto;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
+@Validated
 @RestController
 @RequestMapping("/items")
 @RequiredArgsConstructor
@@ -43,13 +47,17 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemWithBookingsDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId) {
-        return itemService.getAllItemsByUser(userId);
+    public List<ItemWithBookingsDto> getItems(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                              @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                              @RequestParam(defaultValue = "10") @Positive int size) {
+        return itemService.getAllItemsByUser(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> getRequiredItems(@RequestParam("text") String query) {
-        return itemService.getRequired(query);
+    public List<ItemDto> getRequiredItems(@RequestParam("text") String query,
+                                          @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                          @RequestParam(defaultValue = "10") @Positive int size) {
+        return itemService.getRequired(query, from, size);
     }
 
 }
